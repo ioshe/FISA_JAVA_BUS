@@ -18,13 +18,12 @@ public class Input extends Reservation{
 				Scanner sc = new Scanner(System.in);
 				String b = ac.next();
 				int cusnum = Integer.parseInt(b);
-				if(cusnum<1) {
-					System.out.println("올바른 인원이 아니라 종료합니다");
-					break;
+				try {
+					userInputNum(cusnum);
+				} catch (reserveException e) {
+					e.printStackTrace();
+					continue;
 				}
-//				for (int i=0; i< cusnum; i++) {
-//					
-//				}
 				R.customerNum=cusnum;
 				System.out.println(R.customerNum+"명 예약하셨습니다.***");
 				System.out.println("승객 이름을입력해주세요");
@@ -47,7 +46,11 @@ public class Input extends Reservation{
 				R.endLoc=end;
 				
 				ArrayList<Bus> busTables = Bus.findLocation(start, end); //start와 end의 매개변수를 가지고 조건에 맞는 bus를 담아서 가져옴
-				// 만약 busTable이 비어 있다면 예외발생 그 이유는 start와 end 중에 하나가 잘못 입력되었다는 뜻 그러면 start와 end를 다시 받아야 함.
+				// 만약 busTable이 비어 있다면(일치x) 예외발생 그 이유는 start와 end 중에 하나가 잘못 입력되었다는 뜻 그러면 start와 end를 다시 받아야 함.
+				if (busTables.size()==0) {
+					System.out.println("승하차지를 잘못 입력하셨습니다.");
+					continue;
+				}
 				busTable(busTables); //버스에 대한 테이블 출력 ex) "번호: %d, 버스타입: %s, 시간: %s, 버스이름: %s, 출발지: %s, 도착지: %s"
 				busTimes(busTables); // 몇번째 버스를 고르시겠습니까
 				showReservation(R); //=========== 예약 정보 =========== 출력
@@ -98,6 +101,13 @@ public class Input extends Reservation{
 		        "번호: %d, 버스타입: %s, 시간: %s, 버스이름: %s, 출발지: %s, 도착지: %s", 
 		        i, bus.busType, bus.time, bus.busName, bus.startLoc, bus.endLoc));
 		}
+	} 
+	public static void userInputNum(int userInput) throws reserveException {
+		if (userInput > 10) {
+			throw new reserveException("인원이 10명이 넘게 예약할 수 없습니다.");
+		} 
+
+			System.out.println(userInput);
 	}
 }
 
