@@ -12,7 +12,7 @@ public class Bus {
 	String busName;
 	String busType;
 	
-	Bus(String busName,String startLoc,String endLoc,String time,String type,int[] prices) {
+	Bus(String busName,String startLoc,String endLoc,String time,String busType,int[] prices) {
 		this.busName = busName;
 	    this.startLoc = startLoc;
 	    this.endLoc = endLoc;
@@ -33,8 +33,9 @@ public class Bus {
 	static ArrayList<Bus> findLocation(String startLoc,String endLoc) {
 		ArrayList<Bus> correctbus = new ArrayList<>();
 		for (Bus bus : BusInfo) {
-			System.out.println(bus.busName);
-			if (bus.startLoc.equals(startLoc) && (bus.endLoc.equals(endLoc))) {
+			//System.out.println(bus.busName);
+			if (bus.startLoc.toLowerCase().equals(startLoc.toLowerCase()) 
+					&& (bus.endLoc.toLowerCase().equals(endLoc.toLowerCase()))) {
 				correctbus.add(bus);
 			}
 		}

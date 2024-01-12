@@ -1,5 +1,6 @@
 package BusReservation;
 
+import java.util.ArrayList;
 import java.util.Scanner;
 
 
@@ -44,12 +45,8 @@ public class Input extends Reservation{
 				String end = dc.next();
 				R.endLoc=end;
 				
-				System.out.println("시간을 선택해주세요 00:00 06:00 12:00 18:00");
-				Scanner fc = new Scanner(System.in);
-				String time = fc.next();
-				R.time=time;
-				
-				
+				ArrayList<Bus> busTimes = Bus.findLocation(start, end);
+				busTable(busTimes);
 			}
 			else if(a.equals("2")) {
 				System.out.println("시스템종료");
@@ -59,6 +56,18 @@ public class Input extends Reservation{
 				System.out.println("제대로 입력");
 			}
 		}
+	}
+	private void busTable(ArrayList<Bus> busTimes) {
+		for (Bus bus : busTimes) {
+			System.out.println(String.format(
+					"버스타입 : %s,\t 시간 : %s,\t 버스이름 : %s,\t 출발지 : (%s),\t 도착지 (%s)", 
+					bus.busType,bus.time,bus.busName,bus.startLoc,bus.endLoc));
+			
+		}
+		
+		Scanner fc = new Scanner(System.in);
+		String time = fc.next();
+		R.time=time;
 	}
 }
 
