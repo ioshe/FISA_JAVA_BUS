@@ -1,6 +1,7 @@
 package BusReservation;
 
 import java.util.ArrayList;
+import java.util.Map;
 import java.util.Scanner;
 
 
@@ -44,29 +45,59 @@ public class Input extends Reservation{
 				Scanner ec = new Scanner(System.in);
 				String end = dc.next();
 				R.endLoc=end;
-				ArrayList<Bus> busTimes = Bus.findLocation(start, end);
-				busTable(busTimes);
+				
+				ArrayList<Bus> busTables = Bus.findLocation(start, end); //start와 end의 매개변수를 가지고 조건에 맞는 bus를 담아서 가져옴
+				// 만약 busTable이 비어 있다면 예외발생 그 이유는 start와 end 중에 하나가 잘못 입력되었다는 뜻 그러면 start와 end를 다시 받아야 함.
+				busTable(busTables); //버스에 대한 테이블 출력 ex) "번호: %d, 버스타입: %s, 시간: %s, 버스이름: %s, 출발지: %s, 도착지: %s"
+				busTimes(busTables); // 몇번째 버스를 고르시겠습니까
+				showReservation(R); //=========== 예약 정보 =========== 출력
+				
 			}
 			else if(a.equals("2")) {
 				System.out.println("시스템종료");
 				break;
-			}
+			} 
 			else {
 				System.out.println("제대로 입력");
 			}
 		}
 	}
-	private void busTable(ArrayList<Bus> busTimes) {
-		for (Bus bus : busTimes) {
-			System.out.println(String.format(
-					"버스타입 : %s,\t 시간 : %s,\t 버스이름 : %s,\t 출발지 : (%s),\t 도착지 (%s)", 
-					bus.busType,bus.time,bus.busName,bus.startLoc,bus.endLoc));
-			
-		}
-		
+
+
+
+	private void showReservation(Reservation r) {
+	    System.out.println("=========== 예약 정보 ===========");
+	    System.out.println("예약한 승객 수: " + r.customerNum);
+	    
+	    System.out.println("---승객 정보---");
+	    for (Map.Entry<String, Integer> entry : r.customerInfo.entrySet()) {
+	        System.out.println("이름: " + entry.getKey() + ", 나이: " + entry.getValue());
+	    }
+
+	    System.out.println("출발지: " + r.startLoc);
+	    System.out.println("도착지: " + r.endLoc);
+	    System.out.println("예약한 버스 시간: " + r.time);
+	    System.out.println("=================================");
+	}
+
+	
+
+
+	private void busTimes(ArrayList<Bus> busTables) {
+		System.out.println("\n 몇번째 버스를 고르시겠습니까");
 		Scanner fc = new Scanner(System.in);
-		String time = fc.next();
-		R.time=time;
+		int time = fc.nextInt();
+		R.time=busTables.get(time).time;
+	}
+
+
+	private void busTable(ArrayList<Bus> busTables) {
+		for (int i = 0; i < busTables.size(); i++) {
+		    Bus bus = busTables.get(i);
+		    System.out.println(String.format(
+		        "번호: %d, 버스타입: %s, 시간: %s, 버스이름: %s, 출발지: %s, 도착지: %s", 
+		        i, bus.busType, bus.time, bus.busName, bus.startLoc, bus.endLoc));
+		}
 	}
 }
 
