@@ -44,7 +44,6 @@ public class Input extends Reservation{
 				Scanner ec = new Scanner(System.in);
 				String end = dc.next();
 				R.endLoc=end;
-				
 				ArrayList<Bus> busTimes = Bus.findLocation(start, end);
 				busTable(busTimes);
 			}
