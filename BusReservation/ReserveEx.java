@@ -4,7 +4,7 @@ public class ReserveEx {
 
 	public static void main(String[] args) {
 		// TODO Auto-generated method stub
-		
+		//주석 테스트
 		// 시간대별 버스 가격
 		int[] intercityPricesAM = {5000, 15000, 25000, 35000}; // AM - 6:00
 		int[] intercityPricesPM = {10000, 20000, 30000, 40000}; // PM - 12:00, 18:00
