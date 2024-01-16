@@ -19,7 +19,7 @@ public class Input extends Reservation{
 	public void create() {
 		while(true) {
 			
-			System.out.println("버스를 예약 하시겠습니까 1.예 2.아니오");
+			System.out.println("버스를 예약 하시겠습니까 1.예 2.아니오, 3.예약번호 확인");
 			R.customerInfo.clear();//R객체의 이름., 나이 비워줌
 			busTables.clear();//버스 테이블 비워줌
 			Scanner ac = new Scanner(System.in);
@@ -82,23 +82,59 @@ public class Input extends Reservation{
 				}
 				bus_serial correct_bus = busTables.get(time-1); 
 				R.time=correct_bus.getBus_time();
-				
-				//rev_select(correct_bus.getBus_serial_num());
-				priceCal(R,correct_bus);
+				int bus_serial_num = 0;
+				try {
+					DataController.rev_insert(correct_bus.getBus_serial_num());
+					bus_serial_num = DataController.rev_select(correct_bus.getBus_serial_num());
+				} catch (Exception e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				}
+				priceCal(R,bus_serial_num);
 				showReservation(R); //=========== 예약 정보 =========== 출력
 				System.out.println("예약을 완료했습니다.");
+				try {
+					System.out.println();
+					System.out.println(String.format("고객님의 rev 번호는 %d 고객님의 버스 번호는 %s 입니다.",bus_serial_num,correct_bus.getBus_serial_num()));
+					
+				} catch (Exception e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				}
 			}
 			else if(a.equals("2")) {
 				System.out.println("시스템종료");
 				break;
 			} 
+			else if(a.equals("3")) {
+				System.out.println("예약번호를 입력하세요 : ");
+				Scanner asdf = new Scanner(System.in);
+				ArrayList<customer> cusList = new ArrayList<>(); 
+				int rev_nu = asdf.nextInt();
+				try {
+					cusList = DataController.cus_select(rev_nu);
+				} catch (Exception e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				}
+				
+				for (int i = 0; i < cusList.size(); i++) {
+				    customer cus = cusList.get(i);
+				    System.out.println("번호: " + (i+1) +
+				            ", 이름 : " + cus.getName() +
+				            ", 나이 : " + cus.getAge() +
+				            ", 가격 : " + cus.getPrice() +
+				            ", 예약번호 : " + cus.getReservation_ID() +
+				            " ");
+				}
+			}
 			else {
 				System.out.println("제대로 입력");
 			}
 		}
 	}
 
-	private void priceCal(Reservation r,bus_serial correct_bus){
+	private void priceCal(Reservation r,int bus_serial_num){
 		for (Entry<String, Integer> entry : r.customerInfo.entrySet()) {
             String key = entry.getKey();//이름
             Integer value = entry.getValue();//나이
@@ -113,7 +149,12 @@ public class Input extends Reservation{
             Price=checkAge(Price,value);
             Price =checkTime(Price,R.time);
             System.out.println("이름: " + key + ", 나이: " + value+ ", 가격"+ Price);
-            //cus_insert(key,value,Price,rev_select(correct_bus.getBus_serial_num()));
+            try {
+				DataController.cus_insert(key,value,Price,bus_serial_num);
+			} catch (Exception e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
         }
 		
 	}
