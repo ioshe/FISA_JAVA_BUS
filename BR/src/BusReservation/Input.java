@@ -3,6 +3,8 @@ package BusReservation;
 import java.util.ArrayList;
 import java.util.Map;
 import java.util.Scanner;
+import java.util.Map.Entry;
+
 import model.domain.*;
 import DBUtil.Util;
 import controller.DataController;
@@ -10,9 +12,16 @@ import controller.DataController;
 
 public class Input extends Reservation{
 	Reservation R=new Reservation();
+	static int child=1000,student=500,elder=800;// 7세미만 유아 , 20세미만 student , 65세이상 노인 할인율
+	static int AM=10, PM=5; // 오전 오후 할인율
+	ArrayList<bus_serial> busTables = new ArrayList<>();
+	
 	public void create() {
 		while(true) {
+			
 			System.out.println("버스를 예약 하시겠습니까 1.예 2.아니오");
+			R.customerInfo.clear();//R객체의 이름., 나이 비워줌
+			busTables.clear();//버스 테이블 비워줌
 			Scanner ac = new Scanner(System.in);
 			String a = ac.next();
 			if(a.equals("1")) {
@@ -27,16 +36,18 @@ public class Input extends Reservation{
 					continue;
 				}
 				R.customerNum=cusnum;
-				System.out.println(R.customerNum+"명 예약하셨습니다.***");
-				System.out.println("승객 이름을입력해주세요");
-				Scanner bc = new Scanner(System.in);
-				String cusname = bc.next();
-				System.out.println("승객 나이를입력해주세요");
-				Scanner cc = new Scanner(System.in);
-				String age = cc.next();
-				int age1 = Integer.parseInt(age);
-				R.customerInfo.put(cusname,age1);
-		
+				for(int i=0; i<cusnum; i++) {
+					System.out.println(R.customerNum+"명 예약하셨습니다.***");
+					System.out.println("승객 이름을입력해주세요");
+					Scanner bc = new Scanner(System.in);
+					String cusname = bc.next();
+					System.out.println("승객 나이를입력해주세요");
+					Scanner cc = new Scanner(System.in);
+					String age = cc.next();
+					int age1 = Integer.parseInt(age);
+					checkOut(age1);
+					R.customerInfo.put(cusname,age1);
+				}
 				System.out.println("승차지를 선택해주세요 Seoul Busan Incheon Daegu");
 				Scanner dc = new Scanner(System.in);
 				String start = dc.next();
@@ -47,7 +58,7 @@ public class Input extends Reservation{
 				String end = dc.next();
 				R.endLoc=end;
 				
-				ArrayList<bus_serial> busTables = null;
+				
 				try {
 					busTables = DataController.bus_select(start, end);
 				} catch (Exception e) {
@@ -69,9 +80,13 @@ public class Input extends Reservation{
 					System.out.println("유효한 범위를 입력하세요");
 					continue;
 				}
-				R.time=busTables.get(time-1).getBus_time();
-				showReservation(R); //=========== 예약 정보 =========== 출력
+				bus_serial correct_bus = busTables.get(time-1); 
+				R.time=correct_bus.getBus_time();
 				
+				//rev_select(correct_bus.getBus_serial_num());
+				priceCal(R,correct_bus);
+				showReservation(R); //=========== 예약 정보 =========== 출력
+				System.out.println("예약을 완료했습니다.");
 			}
 			else if(a.equals("2")) {
 				System.out.println("시스템종료");
@@ -83,7 +98,71 @@ public class Input extends Reservation{
 		}
 	}
 
-
+	private void priceCal(Reservation r,bus_serial correct_bus){
+		for (Entry<String, Integer> entry : r.customerInfo.entrySet()) {
+            String key = entry.getKey();//이름
+            Integer value = entry.getValue();//나이
+            //int hour=Integer.parseInt(R.time.split(":")[0]);//string인 time을 int로
+            int Price=10000;
+//            if() { 		//고속버스이면
+//            	Price=12000;
+//            }
+//            else {		//시외버스이면
+//            	Price=20000;
+//            }
+            Price=checkAge(Price,value);
+            Price =checkTime(Price,R.time);
+            System.out.println("이름: " + key + ", 나이: " + value+ ", 가격"+ Price);
+            //cus_insert(key,value,Price,rev_select(correct_bus.getBus_serial_num()));
+        }
+		
+	}
+	private int checkTime(int Price,String time) {
+		int hour=Integer.parseInt(R.time.split(":")[0]);//string인 time을 int로
+		if(hour>0 && hour<12) {
+			//Price=(Price)*((100-AM)/100);
+			Price=(Price*(100-AM))/100;
+			//Price=Price-AM;
+			System.out.println("오전가격은 "+AM+"% 만큼 할인됩니다.");
+		}
+		else {
+			Price=(Price*(100-PM))/100;
+			//Price=Price-PM;
+			System.out.println("오후가격은 "+PM+"% 만큼 할인됩니다.");
+		}
+		return Price;
+	}
+	private int checkAge(int Price, int value) {
+		
+		if(value<7) {//일곱살 아래면 
+        	Price=Price-child;
+        	//System.out.println(Price);
+        }
+        else if (value<18) {//청소년이면
+        	Price=Price-student;
+        	//System.out.println(Price);
+        }
+        else if (value>65) {//노인이면
+        	Price=Price-elder;
+        	//System.out.println(Price);
+        }
+		return Price;
+	}
+	private void checkOut(int age) {
+		if(age<7) {//일곱살 아래면 
+        	System.out.println("어린이 가격으로 적용됩니다**");
+        }
+        else if (age<18) {//청소년이면
+        	System.out.println("청소년 가격으로 적용됩니다**");
+        }
+        else if (age>65) {//노인이면
+        	System.out.println("노인 가격으로 적용됩니다.**");;
+        }
+        else {
+        	System.out.println("성인 가격으로 적용됩니다.**");
+        }
+		
+	}
 
 	private void showReservation(Reservation r) {
 	    System.out.println("=========== 예약 정보 ===========");
@@ -103,11 +182,6 @@ public class Input extends Reservation{
 	
 
 
-	private void busTimes(ArrayList<bus_serial> busTables) {
-		
-		// 현재 busTables의 개수보다 작거나 큰 값을 입력하면 팅기게 해줘야하는데
-		
-	}
 
 
 	private void busTable(ArrayList<bus_serial> busTables) {
@@ -126,4 +200,3 @@ public class Input extends Reservation{
 			System.out.println(userInput);
 	}
 }
-
