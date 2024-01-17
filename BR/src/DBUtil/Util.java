@@ -19,9 +19,10 @@ public class Util {
         
         // get Connection
         public static Connection getConnection() throws SQLException{
-                String url = "jdbc:mysql://woori-fisa2.cfnz7hfzq9bn.ap-northeast-2.rds.amazonaws.com/bus?characterEncoding=UTF-8&serverTimezone=UTC";
-                String id = "admin";
-                String pw = "woorifisa2!";
+                String url = "jdbc:mysql://localhost:3306/your_database_name?characterEncoding=UTF-8&serverTimezone=UTC";
+                String id = "ID";
+                String pw = "password";
+                //localhost:3306/your_database_name 의 부분을 고쳐서 사용가능
                 
                 return DriverManager.getConnection(url, id, pw);
         }
